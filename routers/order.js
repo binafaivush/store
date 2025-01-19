@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { addOrder, deleteOrderById, getAllOrders, updateOrderOnWay, getAllOrdersByUserId} from "../controllers/order.js"
+import { addOrder, deleteOrderById, getAllOrders, updateOrderOnWay, getAllOrdersByUserId } from "../controllers/order.js"
 
 const router = Router();
 
@@ -10,6 +10,6 @@ router.get("/", getAllOrders);
 router.get("/:id", getAllOrdersByUserId);
 router.delete("/:id", deleteOrderById);
 router.put("/:id", updateOrderOnWay);
-router.post("/", addOrder) 
+router.post("/", addOrder)
 
 export default router;

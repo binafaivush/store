@@ -2,7 +2,7 @@ import { isValidObjectId } from "mongoose";
 
 // import{orderModel} from "../models/order.js"
 // import { userModel } from "../models/user.js";
-import { productModel} from "../models/product.js";
+import { productModel } from "../models/product.js";
 
 //good
 export const getAllProducts = async (req, res, next) => {
@@ -64,16 +64,16 @@ export const getProductById = async (req, res, next) => {
 //good
 export const addProduct = async (req, res, next) => {
   let { body } = req;
-  if(!body.name || !body.price ||! body.price > 0)
-    return res.status(404).json( {title:"missing details ", message:"name or price arr missing"})
+  if (!body.name || !body.price || !body.price > 0)
+    return res.status(404).json({ title: "missing details ", message: "name or price arr missing" })
 
-  if(body.productionDate && body.productionDate > new Date())
-    return res.status(404).json( {title:"wrong date ", message:"date is later than today "})
+  if (body.productionDate && body.productionDate > new Date())
+    return res.status(404).json({ title: "wrong date ", message: "date is later than today " })
 
   try {
-    
-     let newProduct = new productModel(body); 
-    await newProduct.save(); 
+
+    let newProduct = new productModel(body);
+    await newProduct.save();
     res.json(newProduct);
   } catch (err) {
     res.status(400).json({ title: "cannot save product", message: err.message });
@@ -81,7 +81,7 @@ export const addProduct = async (req, res, next) => {
 };
 
 //good
-export const deleteProductById = async ( req, res, next )=>{
+export const deleteProductById = async (req, res, next) => {
   let { id } = req.params;
   if (!isValidObjectId(id))
     return res.status(400).json({
@@ -91,21 +91,21 @@ export const deleteProductById = async ( req, res, next )=>{
   console.log("------" + id);
 
   productModel.findByIdAndDelete(id)
-  .then(data => {
-      if(!data)
-          return res.status(404).json({title: "cannot delete by id", message:"no product with such id "+ id})
+    .then(data => {
+      if (!data)
+        return res.status(404).json({ title: "cannot delete by id", message: "no product with such id " + id })
       res.json(data)
-  })
-  .catch(error => {
-      res.status(400).json({title:"cannot delete by id ", massage: error.message})
-  })
+    })
+    .catch(error => {
+      res.status(400).json({ title: "cannot delete by id ", massage: error.message })
+    })
 
 }
 
 //good
 export const updateProductById = async (req, res, next) => {
-  let {id} = req.params;
-  let {body} = req;
+  let { id } = req.params;
+  let { body } = req;
 
   //לפי השאלה  שלי בסוף הפונקציה לעשות בדיקות תקינות למה שצריך לעשות
 
@@ -116,13 +116,13 @@ export const updateProductById = async (req, res, next) => {
     });
   console.log("------" + id);
 
-  await productModel.findByIdAndUpdate(id, body,{new: true})// לשאול האם השורה הזו מעדכנת רק את השורות שנשלחו עדכונים ומשאירה את הישנים שלא נשלחו עדכונים כפי שהם היו
-  .then(data => {
-      if(!data)
-          return res.status(404).json({ title: "cannot update product by id", message: "no product with such id: " + id})
+  await productModel.findByIdAndUpdate(id, body, { new: true })// לשאול האם השורה הזו מעדכנת רק את השורות שנשלחו עדכונים ומשאירה את הישנים שלא נשלחו עדכונים כפי שהם היו
+    .then(data => {
+      if (!data)
+        return res.status(404).json({ title: "cannot update product by id", message: "no product with such id: " + id })
       res.json(data)
-  })
-  .catch(error => {
-      res.status(400).json({title: "cannot update product by id", message:error.message})
-  })
+    })
+    .catch(error => {
+      res.status(400).json({ title: "cannot update product by id", message: error.message })
+    })
 }

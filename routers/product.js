@@ -8,7 +8,7 @@ const router = Router();
 //כל הפונקציות הבאות עובדות פצצה ניסיתי אותן
 
 router.get("/", getAllProducts);
-router.get("/:id",getProductById);
+router.get("/:id", getProductById);
 router.delete("/:id", deleteProductById);
 router.put("/:id", updateProductById);
 router.post("/", addProduct);
