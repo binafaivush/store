@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import cors from "cors";
 
 import orderRouter from "./routers/order.js";
 import productRouter from "./routers/product.js";
@@ -11,13 +12,10 @@ const app = express();
 connectToDB();
 dotenv.config();//מה זה?
 
+
 app.use(logToFile);
 app.use(express.json());
-
-app.get("/all", () => {
-  console.log("hello to you");
-
-})
+app.use(cors());
 
 app.use("/api/user", userRouter);
 app.use("/api/product", productRouter);
@@ -27,3 +25,9 @@ const port = process.env.PORT;
 app.listen(port, "localhost", () => {
   console.log("app is running on port " + port);
 });
+
+
+app.get("/all", () => {
+  console.log("hello to you");
+
+})

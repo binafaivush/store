@@ -5,27 +5,26 @@ import { userModel } from "../models/user.js";
 import { productModel } from "../models/product.js";
 
 //good
-export const signUp = async (req, res, next) => {//חסרה כאן בדיקה שאין משתמש עם פרטים זהים 
+export const signUp = async (req, res, next) => {
   let { body } = req;
   if (!body.userName || !body.email || !body.password)
     return res.status(404).json({ title: "missing details ", message: "userName, email and password are required " })
 
-try{ 
-  let users = await userModel.find({ userName:body.userName, password: body.password })
-  if (users.length > 0) {
+  try {
+    let users = await userModel.find({ userName: body.userName, password: body.password })
+    if (users.length > 0) {
       return res.status("400").json({
-          title: "log in",
-          message: "there is user with this details"
+        title: "log in",
+        message: "there is user with this details"
       })
+    }
   }
-}
-catch(err){
-  return res.status("400").json({
-    title: "cannot log in",
-    message: "could not check for validation"
-})
-
-}
+  catch (err) {
+    return res.status("400").json({
+      title: "cannot log in",
+      message: "could not check for validation"
+    })
+  }
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // email format
   if (!emailRegex.test(body.email)) {
     return res.status(400).json({
@@ -42,15 +41,14 @@ catch(err){
   }
   body.role = "USER";
   try {
-
-    let newUser = new userModel(body);
+    let newUser = new userModel(body); // הסרתי את .lean() כי זה לא מתאים כאן
     await newUser.save();
+    delete newUser.password; // זה לא ישפיע כאן, כי newUser הוא אובייקט Mongoose
     res.json(newUser);
   } catch (err) {
     res.status(400).json({ title: "cannot save user", message: err.message });
   }
 };
-
 
 //good
 export const getUserById = async (req, res, next) => {
@@ -62,11 +60,12 @@ export const getUserById = async (req, res, next) => {
     });
   console.log("------" + id);
   try {
-    let result = await userModel.findById(id);
+    let result = await userModel.findById(id).lean(); // הוספתי .lean()
     if (!result)
       return res
         .status(400)
         .json({ title: "cannot get user by id", message: "no such user" });
+    delete result.password; // זה עובד עכשיו
     res.json(result);
   } catch (err) {
     res
@@ -78,7 +77,10 @@ export const getUserById = async (req, res, next) => {
 //good
 export const getAllUsers = async (req, res, next) => {
   try {
-    let result = await userModel.find()
+    let result = await userModel.find().lean(); // הוספתי .lean()
+    for (let i = 0; i < result.length; i++) {
+      delete result[i].password; // זה עובד עכשיו
+    }
     res.json(result);
   }
   catch (err) {
@@ -89,7 +91,6 @@ export const getAllUsers = async (req, res, next) => {
 };
 
 //i think it's good
-
 export const updateUserDetails = async (req, res, next) => {
   let { id } = req.params;
   let { body } = req;
@@ -103,10 +104,11 @@ export const updateUserDetails = async (req, res, next) => {
     });
   console.log("------" + id);
 
-  userModel.findByIdAndUpdate(id, update, { new: true })// לשאול האם השורה הזו מעדכנת רק את השורות שנשלחו עדכונים ומשאירה את הישנים שלא נשלחו עדכונים כפי שהם היו
+  userModel.findByIdAndUpdate(id, update, { new: true }).lean() // הוספתי .lean()
     .then(data => {
       if (!data)
         return res.status(404).json({ title: "cannot update user by id", message: "no user with such id: " + id })
+      delete data.password; // זה עובד עכשיו
       res.json(data)
     })
     .catch(error => {
@@ -136,26 +138,25 @@ export const updateUserPassword = async (req, res, next) => {
     });
   }
 
-  userModel.findByIdAndUpdate(id, { password: password }, { new: true })
+  userModel.findByIdAndUpdate(id, { password: password }, { new: true }).lean() // הוספתי .lean()
     .then(data => {
       if (!data) {
         return res.status(404).json({ title: "cannot update password by id", message: "no user with such id: " + id });
       }
+      delete data.password; // זה עובד עכשיו
       res.json(data);
     })
     .catch(error => {
       res.status(400).json({ title: "cannot update user password by id", message: error.message });
     });
 };
-//////////////////////////////////////////////////////////////////////////////////////////
 
 export const login = async (req, res, next) => {
-
   let { body } = req;
   if (!body.password || !body.userName)
-    return res.status(404).json({ title: "missing ", message: "userName and passworrd are required" })
+    return res.status(404).json({ title: "missing ", message: "userName and password are required" })
   try {
-    let result = await userModel.findOne({ userName: body.userName, password: body.password });
+    let result = await userModel.findOne({ userName: body.userName, password: body.password }).lean(); // הוספתי .lean()
     if (!result)
       return res.status(404).json({ title: "no such details ", message: "login failed" })
     res.json(result);
@@ -163,5 +164,4 @@ export const login = async (req, res, next) => {
   catch (err) {
     res.status(400).json({ title: "cannot users", message: err.message })
   }
-
 }
