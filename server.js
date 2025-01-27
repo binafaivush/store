@@ -22,7 +22,7 @@ app.use("/api/user", userRouter);
 app.use("/api/product", productRouter);
 app.use("/api/order", orderRouter);
 
-const port = process.env.PORT;
+const port = process.env.PORT||4000;
 app.listen(port, () => {
   console.log("app is running on port " + port);
 });
