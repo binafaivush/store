@@ -8,7 +8,14 @@ import { productModel } from "../models/product.js";
 //good
 export const getAllOrders = async (req, res, next) => {
   try {
-    let result = await orderModel.find()
+
+    let limit = req.query.limit || 10;
+    let page = req.query.page || 1;
+    let str = req.query.str || "";
+
+    let reg = new RegExp(str, 'i');
+
+    let result = await orderModel.find({adress: reg}).sort({finalPrice: -1}).skip(((page - 1) * limit)).limit(limit);
     // .populate("order"/*הולך לשדה הזה ומחפש איבר מתאים מהאוסף המתאים כפי שכתוב במודל*/);
     res.json(result);
   } catch (err) {

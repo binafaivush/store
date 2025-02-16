@@ -5,7 +5,7 @@ import { signUp, getAllUsers, getUserById, updateUserDetails, updateUserPassword
 
 const router = Router();
 
-//הכל עובד מצוין  בדקתי את כולן
+//הכל עובד מצוין בדקתי את כולן
 
 router.get("/", getAllUsers);
 router.get("/:id", getUserById);

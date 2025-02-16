@@ -43,6 +43,7 @@ export const signUp = async (req, res, next) => {
   try {
     let newUser = new userModel(body); // הסרתי את .lean() כי זה לא מתאים כאן
     await newUser.save();
+    newUser = newUser.toObject();
     delete newUser.password; // זה לא ישפיע כאן, כי newUser הוא אובייקט Mongoose
     res.json(newUser);
   } catch (err) {
@@ -77,7 +78,14 @@ export const getUserById = async (req, res, next) => {
 //good
 export const getAllUsers = async (req, res, next) => {
   try {
-    let result = await userModel.find().lean(); // הוספתי .lean()
+
+    let limit = req.query.limit || 10;
+    let page = req.query.page || 1;
+    let str = req.query.str || "";
+
+    let reg = new RegExp(str, 'i');
+
+    let result = await userModel.find({userName: reg}).sort({userName: 1}).skip(((page - 1) * limit)).limit(limit).lean(); // הוספתי .lean()
     for (let i = 0; i < result.length; i++) {
       delete result[i].password; // זה עובד עכשיו
     }
